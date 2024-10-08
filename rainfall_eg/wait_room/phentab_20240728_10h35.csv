@@ -1,0 +1,90 @@
+,phid,phen_name_full,phen_type,phen_name,units,measure,offset,var_type,uz_phen_name,uz_units,uz_measure,f_convert,sensor_id,notes
+1,4,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached,no_spec,no_spec,NA,NA,NA
+2,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20102559),no_spec,no_spec,NA,NA,NA
+3,4,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20102567),no_spec,no_spec,NA,NA,NA
+4,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20102572),no_spec,no_spec,NA,NA,NA
+5,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20102578),no_spec,no_spec,NA,NA,NA
+6,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20112167),no_spec,no_spec,NA,NA,NA
+7,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20112169),no_spec,no_spec,NA,NA,NA
+8,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20112179),no_spec,no_spec,NA,NA,NA
+9,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20112198),no_spec,no_spec,NA,NA,NA
+10,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20112199),no_spec,no_spec,NA,NA,NA
+11,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20116788),no_spec,no_spec,NA,NA,NA
+12,3,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20116793),no_spec,no_spec,NA,NA,NA
+13,5,Interference event: bad battery,Interference event,bad_battery,event,event,NA,fac,Bad Battery (LGR S/N: 20116793),no_spec,no_spec,NA,NA,NA
+14,2,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected,no_spec,no_spec,NA,NA,NA
+15,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20102559),no_spec,no_spec,NA,NA,NA
+16,2,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20102567),no_spec,no_spec,NA,NA,NA
+17,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20102572),no_spec,no_spec,NA,NA,NA
+18,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20102578),no_spec,no_spec,NA,NA,NA
+19,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20112167),no_spec,no_spec,NA,NA,NA
+20,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20112169),no_spec,no_spec,NA,NA,NA
+21,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20112179),no_spec,no_spec,NA,NA,NA
+22,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20112198),no_spec,no_spec,NA,NA,NA
+23,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20112199),no_spec,no_spec,NA,NA,NA
+24,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20116788),no_spec,no_spec,NA,NA,NA
+25,4,Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20116793),no_spec,no_spec,NA,NA,NA
+26,3,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached,no_spec,no_spec,NA,NA,NA
+27,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20102559),no_spec,no_spec,NA,NA,NA
+28,3,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20102567),no_spec,no_spec,NA,NA,NA
+29,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20102572),no_spec,no_spec,NA,NA,NA
+30,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20102578),no_spec,no_spec,NA,NA,NA
+31,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20112167),no_spec,no_spec,NA,NA,NA
+32,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20112169),no_spec,no_spec,NA,NA,NA
+33,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20112179),no_spec,no_spec,NA,NA,NA
+34,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20112198),no_spec,no_spec,NA,NA,NA
+35,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20112199),no_spec,no_spec,NA,NA,NA
+36,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20116788),no_spec,no_spec,NA,NA,NA
+37,2,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached (LGR S/N: 20116793),no_spec,no_spec,NA,NA,NA
+38,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File,no_spec,no_spec,NA,NA,NA
+39,6,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20102559),no_spec,no_spec,NA,NA,NA
+40,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20102567),no_spec,no_spec,NA,NA,NA
+41,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20102572),no_spec,no_spec,NA,NA,NA
+42,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20102578),no_spec,no_spec,NA,NA,NA
+43,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20112167),no_spec,no_spec,NA,NA,NA
+44,6,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20112169),no_spec,no_spec,NA,NA,NA
+45,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20112179),no_spec,no_spec,NA,NA,NA
+46,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20112198),no_spec,no_spec,NA,NA,NA
+47,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20112199),no_spec,no_spec,NA,NA,NA
+48,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20116788),no_spec,no_spec,NA,NA,NA
+49,5,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File (LGR S/N: 20116793),no_spec,no_spec,NA,NA,NA
+50,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Event, mm (LGR S/N: 20102572, SEN S/N: 20102572)",no_spec,no_spec,NA,NA,NA
+51,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Event, mm (LGR S/N: 20112169, SEN S/N: 20112169)",no_spec,no_spec,NA,NA,NA
+52,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Event, mm (LGR S/N: 20112198, SEN S/N: 20112198, LBL: Rainfall)",no_spec,no_spec,NA,NA,NA
+53,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20102559,no_spec,no_spec,NA,NA,NA
+54,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20102567,no_spec,no_spec,NA,NA,NA
+55,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20102572,no_spec,no_spec,NA,NA,NA
+56,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20102578,no_spec,no_spec,NA,NA,NA
+57,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20112167,no_spec,no_spec,NA,NA,NA
+58,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20112169,no_spec,no_spec,NA,NA,NA
+59,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20112179,no_spec,no_spec,NA,NA,NA
+60,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20112199,no_spec,no_spec,NA,NA,NA
+61,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20116788,no_spec,no_spec,NA,NA,NA
+62,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20116793,no_spec,no_spec,NA,NA,NA
+63,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20102559, SEN S/N: 20102559)",no_spec,no_spec,NA,NA,NA
+64,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20102567, SEN S/N: 20102567)",no_spec,no_spec,NA,NA,NA
+65,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20102572, SEN S/N: 20102572)",no_spec,no_spec,NA,NA,NA
+66,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20102578, SEN S/N: 20102578)",no_spec,no_spec,NA,NA,NA
+67,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20112167, SEN S/N: 20112167)",no_spec,no_spec,NA,NA,NA
+68,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20112169, SEN S/N: 20112169)",no_spec,no_spec,NA,NA,NA
+69,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20112179, SEN S/N: 20112179)",no_spec,no_spec,NA,NA,NA
+70,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20112199, SEN S/N: 20112199)",no_spec,no_spec,NA,NA,NA
+71,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20116788, SEN S/N: 20116788)",no_spec,no_spec,NA,NA,NA
+72,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Rainfall, mm (LGR S/N: 20116793, SEN S/N: 20116793)",no_spec,no_spec,NA,NA,NA
+73,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20102559),no_spec,no_spec,NA,NA,NA
+74,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20102567),no_spec,no_spec,NA,NA,NA
+75,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20102572),no_spec,no_spec,NA,NA,NA
+76,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20102578),no_spec,no_spec,NA,NA,NA
+77,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20112167),no_spec,no_spec,NA,NA,NA
+78,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20112169),no_spec,no_spec,NA,NA,NA
+79,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20112198),no_spec,no_spec,NA,NA,NA
+80,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20112199),no_spec,no_spec,NA,NA,NA
+81,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20116788),no_spec,no_spec,NA,NA,NA
+82,5,Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20116793),no_spec,no_spec,NA,NA,NA
+83,2,Interference event: coupler attached,Interference event,attached,event,event,NA,fac,attached,event,event,NA,NA,NA
+84,2,Interference event: bad battery,Interference event,bad_battery,event,event,NA,fac,bad_battery,event,event,NA,NA,NA
+85,5,Interference event: host connected,Interference event,connected,event,event,NA,fac,connected,event,event,NA,NA,NA
+86,3,Interference event: coupler detached,Interference event,detached,event,event,NA,fac,detached,event,event,NA,NA,NA
+87,4,Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,end_of_file,event,event,NA,NA,NA
+88,1,Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,rain_cumm,mm,cumm,NA,NA,NA
+89,6,Interference event: stopped,Interference event,stopped,event,event,NA,fac,stopped,event,event,NA,NA,NA

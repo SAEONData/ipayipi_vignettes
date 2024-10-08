@@ -1,0 +1,14 @@
+uz_station,location,station,stnd_title,logger_type,logger_title,uz_record_interval_type,uz_record_interval,record_interval_type,record_interval,uz_table_name,table_name
+Plot Title: Coastal Cashews,mcp,coastal_cashews_rn,mcp_coastal_cashews_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot Title: Mseleni TC,mcp,mabasa_tc_rn,mcp_mabasa_tc_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Manz_Office,mcp,manz_office_rn,mcp_manz_office_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot Title: Sileza,mcp,sileza_camp_rn,mcp_sileza_camp_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot_Title_Coastal_Cashews,mcp,coastal_cashews_rn,mcp_coastal_cashews_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot_Title_Coastal_cashews,mcp,coastal_cashews_rn,mcp_coastal_cashews_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot_Title_Manz_Office,mcp,manz_office_rn,mcp_manz_office_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot_Title_Mseleni_TC,mcp,manz_office_rn,mcp_manz_office_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot_Title_Sileza_Camp,mcp,sileza_camp_rn,mcp_sileza_camp_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot_Title_Sileza_camp,mcp,sileza_camp_rn,mcp_sileza_camp_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot_title_Manz_Office,mcp,manz_office_rn,mcp_manz_office_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Plot_title_Mseleni_TC,mcp,mabasa_tc_rn,mcp_mabasa_tc_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain
+Sileza_Camp,mcp,sileza_camp_rn,mcp_sileza_camp_rn,hobo_pendant,NA,event_based,discnt,event_based,discnt,hobo_data,raw_rain

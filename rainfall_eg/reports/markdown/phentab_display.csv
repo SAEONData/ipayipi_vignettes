@@ -1,0 +1,11 @@
+phen_name_full,phen_type,phen_name,units,measure,offset,var_type,uz_phen_name,uz_units,uz_measure,f_convert,sensor_id,notes
+Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached,no_spec,no_spec,NA,NA,NA
+Interference event: coupler attached,Interference event,attached,event,event,NA,fac,Coupler Attached (LGR S/N: 20102559),no_spec,no_spec,NA,NA,NA
+Interference event: bad battery,Interference event,bad_battery,event,event,NA,fac,Bad Battery (LGR S/N: 20116793),no_spec,no_spec,NA,NA,NA
+Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected,no_spec,no_spec,NA,NA,NA
+Interference event: host connected,Interference event,connected,event,event,NA,fac,Host Connected (LGR S/N: 20102559),no_spec,no_spec,NA,NA,NA
+Interference event: coupler detached,Interference event,detached,event,event,NA,fac,Coupler Detached,no_spec,no_spec,NA,NA,NA
+Interference event: end of file,Interference event,end_of_file,event,event,NA,fac,End Of File,no_spec,no_spec,NA,NA,NA
+Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,"Event, mm (LGR S/N: 20112169, SEN S/N: 20112169)",no_spec,no_spec,NA,NA,NA
+Precipitation: total rainfall,Precipitation,rain_cumm,mm,cumm,0,num,Rainfall (mm)  #20102559,no_spec,no_spec,NA,NA,NA
+Interference event: stopped,Interference event,stopped,event,event,NA,fac,Stopped (LGR S/N: 20102559),no_spec,no_spec,NA,NA,NA

@@ -1,0 +1,655 @@
+---
+title: "<img src=\"ipayipi_120.png\" width=\"30%\" height=\"30%\" style=\"float: right;\"/> <br/> <br/>  ipayipi <br/> <br/> rainfall data pipeline: <br/> imbibe to processed"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+---
+
+```{r setup, echo=FALSE, results="hide"}
+defaultW <- getOption("warn") 
+options(warn = -1)
+
+packages <- c("corrplot", "cowplot", "DT", "dygraphs", "egg", "ggplot2",
+  "Hmisc", "ipayipi", "kableExtra", "khroma", "leaflet", "lubridate",
+  "mice", "plotly", "sf", "viridisLite"
+)
+# Install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+    install.packages(packages[!installed_packages])
+}
+# Packages loading
+suppressMessages(invisible(lapply(packages, library, character.only = TRUE)))
+options(warn = defaultW)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '/home/paulg/Documents/projects_current/ipayipi_data_pipe/')
+plan(multicore)
+```
+
+```{r check-wd, eval=FALSE, echo=FALSE}
+getwd()
+```
+
+# Summary
+
+This vignette serves as protocol for the processing of event-based rainfall data. The steps below cover imbibing, standardisation, and processing---corresponding code to realise these steps are below. Data processing is done in R 'iPayipi'. The data were collected using Hobo-data loggers installed in Texas tipping-bucket rain gauges.
+
+1. Load `R ipayipi` (install from [GitHub](https://github.com/SAEONData/ipayipi)),
+1. Initiate pipeline,
+1. Imbibe data,
+1. Standardise data,
+1. Make station files,
+1. Identify gaps, \&
+1. Process data.
+
+The overview below shows code needed to execute the steps above. Each of these steps are further described in the following sections of this vignette. For more details and options for each step, see respective function documentation/help files in R. The help files serve as documentation protocol for each function used in 'ipayipi'.
+
+```{r pipe steps, eval=FALSE, echo=TRUE, results="hide"}
+## 1. load pacakge
+library(ipayipi)
+
+## 2. initiate pipeline housing ----
+# define the general working directory: wherever data is going to be processed ...
+wd <- "ipayipi_vignettes/rainfall_eg"
+
+# setup pipeline directory structure
+pipe_house <- ipip_house(work_dir = wd)
+
+## 3. read & imbibe in data ----
+logger_data_import_batch(pipe_house)
+imbibe_raw_batch(pipe_house, data_setup = ipayipi::hobo_data)
+
+## 4. standardise data ----
+header_sts(pipe_house)
+phenomena_sts(pipe_house)
+
+## store standardised data ----
+# transfer standardised data to the nomvet_room
+transfer_sts_files(pipe_house)
+
+## 5. append standardised data files ----
+append_station_batch(pipe_house)
+
+## 6. summarise gaps ----
+gap_eval_batch(pipe_house)
+
+## 7. Process data ----
+dt_process_batch(pipe_house = pipe_house, pipe_seq = pipe_seq)
+```
+
+
+# Introduction
+
+This vignette serves as a protocol for processing rainfall data, largely from Texas tipping-bucket rain gauges using R `ipayipi`. `ipayipi` facilitates a dynamic and structured pipeline so that processing down a pipeline (and up again), is traceable.
+
+Texas tipping-bucket rain gauges with hobo-data loggers record rainfall events in a discontinuous or 'event based' manner, that is, the tipping bucket of known volume 'tips' each time it fills with water from the gauge. Each tip gets tallied as an event so that cumulative rainfall can be recorded. Note that this 'discontinuous' event recording contrasts the 'continuous' record-interval type associated with many default loggers settings that record a sample at a specific time and set interval, or average of a phenomenon over a set record interval. The 'discontinuous' nature of event-based time-series data has important implications for how the data.
+
+# Initiate pipeline: the 'pipe_house'
+
+The 'pipe_house' is the name of the directory structure wherein a data-pipeline is maintained. By initiating the pipeline, a number of directories will be created for 'housing' data at various stages of archival and processing, as well as storing scripts, and reports.
+
+To start off, the _relative_ directory where processing is going to done must be defined.
+```{r, pipe_house}
+# setting up the 'pipe_house'
+## define pipeline working directory 'wd' (must be reletive)
+
+wd <- "ipayipi_vignettes/rainfall_eg"
+
+## initiate pipeline
+pipe_house <- ipip_house(work_dir = wd)
+print(pipe_house)
+```
+
+What has `ipip_house()` done? It has created the following directories, if they don't already exist*:
+
+1. 'r': Folder for r scripts. Note the 'pipe_seq' folder contained therein---this will be used to store parameters for processing data later in the pipeline.
+1. 'source_room': where 'new'/incoming logger data is going to be made available.
+2. 'wait_room': waiting room for imbibing & standarising data coming into the pipeline.
+3. 'nomvet_room': where standardised/corrected logger files get archived (**nom**enclature **vet**ted).
+4. 'ipip_room': here data get appended into single station records, and processed.
+5. 'dta_out': Folder to which processed data can be exported in csv format.
+6. 'reports': Folder for general reports, e.g., references or markdown documents.
+5. 'raw_room': where 'unaltered' raw data gets pushed.
+
+*NB! _Running this function will not overwrite existing data_.
+
+# Imbibe data
+
+In this step, incoming data gets pulled from pipelines data source, that is, the 'source room' (`pipe_house$source_room`), into the 'waiting room' (`pipe_house$wait_room`). The example data contains multiple years of hobo-rainfall data exports from [SAEON](https://www.saeon.ac.za) rainfall stations in northern Maputaland, South Africa.
+
+
+```{r, import-set, eval = TRUE, echo = FALSE}
+pipe_house$raw_room <- NULL
+```
+
+```{r, import-imbibe, eval = TRUE}
+# copy data from source to the wait_room
+logger_data_import_batch(pipe_house = pipe_house)
+```
+
+Now that some data is in the 'wait_room' directory we can read it into R. Note the 'data_setup' option for Hobo-data logger file exports `ipayipi::hobo_rain`. Also the `record_interval_type` has been set to 'event_based'; options include 'mixed' and 'continuous'. Use 'event_based' for hobo data (including cases where it is 'mixed' to cater for changes in future outputs). More on this below.
+
+```{r, imbibe, eval = TRUE}
+imbibe_raw_batch(pipe_house = pipe_house,
+  data_setup = ipayipi::hobo_rain, # standard for reading hobo file exports 
+  record_interval_type = "event_based"
+)
+```
+For additional insight into data-input formats, that is, the 'data_setup' argument, _see_ the help files of the `imbibe_raw_logger_dt()` function (i.e., `?imbibe_raw_logger_dt`). The `ipayipi::ipayipi::hobo_rain` caters for three variations in format associated with Hoboware exports. These three variations allow the import of hundreds of differently formatted (unencrypted) Hobo data file exports, and more variations can be added.
+
+Record-interval type is an important parameter. `ipayipi` handles __continuous__, __event-based__ (discontinuous), and __mixed__ time-series data types. Record intervals get evaluated using the `record_interval_eval()` function. Record interval information will be important for further steps, such as, identifying 'gaps' or missing data automatically. More on this below.
+
+
+# Standardise data
+
+Both file-header information, plus other phenomena (variable) metadata, will now be standardised. The spelling/synonyms of file names and associated header metadata have to be scrutinised first. Only after header information gets standardised can we move onto the phenomena.
+
+```{r, nom standard, eval = TRUE}
+# standardise header nomenclature
+header_sts(pipe_house)
+```
+
+If it is the first-time running `header_sts()`, or new synonyms get introduced into pipe-house directory, `header_sts()` will produce a warning. This normally happens when a station name is adjusted a loggr program, or a new station is introduced into the pipeline, the pipeline then needs to define the new-nomenclature standards.
+
+<span style="background-color:#df9a86"> Unstandardised names (or columns) have the preffix '**uz**'</span>. These standards get stored in a file called 'nomtab.rns' in the 'waiting room'. _If this file is deleted---a new one will be generated---but the user will have to populate the tables with synonym vocab_.
+
+The nomenclature table in the 'waiting room' can be updated from the csv file (or directly in R). If a new synonym gets introduced---the file containing new nomenclature will be skipped in further processing---a 'csv' version of the 'nomtab.rns' will be copied to the 'waiting room' for editing.
+
+_Only the following fields_ --- with `NA`s --- _require editing in the 'nomtab' 'csv':_
+
+- <span style="background-color:#aed8f0">location</span>: standardised location shorthand,
+- <span style="background-color:#aed8f0">station</span>: standardised station name,
+- <span style="background-color:#aed8f0">standard title</span>: station name. A concatenation of location and station with suffix denoting the type of station; for rain gauges this suffix is '_rn'. 
+- <span style="background-color:#aed8f0">record interval type</span>: Either 'continuous', 'mixed' or 'event_based'. Automatically generated and saved as unstandardised ('uz') using `record_interval_eval()`. However, if there are in sufficient data records, e.g., one record in a continuous data flow, this needs manual checking. For hobo data this must be set to 'event_based' (even if the data is mixed).
+- <span style="background-color:#aed8f0">record interval </span>: In addition to 'record interval type' the 'record interval' describes the nature of time series data. The 'record interval' is a standardised string describing the interval between data records, e.g., "1_days", for daily. Within this rainfall data pipeline it will be "discnt" for discontinuous data.
+- <span style="background-color:#aed8f0">table name</span>: shorthand description of the data table from respective logger. This should generally be a concatenation of 'raw_' and a description of the time interval between recordings, or for rainfall data, be 'raw_rain' in this pipeline.
+
+Examine the header nomenclature for the example data below. Only the columns highlighted in <span style="background-color:#aed8f0">blue</span> must be edited.
+```{r, nom standard_eg, eval = TRUE, echo = FALSE}
+pt <- read.csv(file.path(pipe_house$reports, "markdown/nomtab_display.csv"))
+kbl(pt) |>
+  kable_paper("hover") |>
+  kable_styling(font_size = 11) |>
+  column_spec(c(1, 7:8, 11), background = "#df9a86") |>
+  column_spec(c(2:6, 9:10, 12), background = "#aed8f0") |>
+  scroll_box(width = "100%", height = "400px")
+```
+Scrolling up and down the table above we see that we are dealing with four different rain gauges or 'stations'. However, in the raw data there are multiple synonyms for each station's standard title. The supplied 'table name', visible scrolling to the right, will be the name of the table for associated raw data in an 'ipayipi' station file; the standard title field will form the file name of the station. Standardising these fields as in the table above is important for further processing of the data.
+
+Once `NA` values of the above fields have been populated the edited 'csv' will be imbibed into the pipeline structure when rerunning `header_sts(pipe_house)`---this function will imbibe the most recently updated 'csv' nomenclature table from the 'wait_room' into the pipeline, and standardised header nomenclature.
+
+**Tip**: Double-check your nomenclature standards in the 'csv' file before running `header_sts()` again!
+
+_In step with good [tidy data](https://www.tidyr.tidyverse.org/articles/tidy-data.html) standards, keep nomenclature to 'snake case' with no special characters (bar the useful underscore')._
+
+Standardising _phenomena_ metadata follows a similar process as for header-data standardisation. If the phenomena standards have been described and there is a 'phentab.rps' in the 'waiting room', running the below code updates all files phenomena details.
+
+```{r, phen standard, eval = FALSE}
+# standardise phenomena
+phenomena_sts(pipe_house = pipe_house)
+```
+
+**Tip**: Setting the `remove_dups` argument to `TRUE` in `phenomena_sts()` allows the user to interactively remove, through a prompt interface, duplicate phenomena, on the off change logger exports have included these. Any interactive (via the prompt line) functionality is only possibly if parallel processing is sequential. See the section on parallel processing at the end.
+
+
+If there is no 'phenomena table' ('phentab.rps'), one `NA` values in the 'csv' copy need to be described. The following fields in the 'csv' phentab must be populated:
+
+- <span style="background-color:#aed8f0">phen_name_full</span>: A descriptive name of the phenomenon (variable).
+- <span style="background-color:#aed8f0">phen_type</span>: the type of phenomena (e.g., atmospheric pressure).
+- <span style="background-color:#aed8f0">phen_name</span>: the name (used as a column header) of the phenomena. Must be created to avoid duplications.
+- <span style="background-color:#aed8f0">units</span>: the measurement unit, e.g., bars.
+- <span style="background-color:#aed8f0">measure</span>: describes how sampling has been done over/at the sampling interval, e.g., mean, min, sample, etc.
+
+Additional fields that are not mandatory include:
+
+- f_convert: A numeric multiplier that will be applied to this phenomena. Useful for converting from unstandardised to standardised units.
+
+If an 'f_convert' factor (_scroll right on the table below_) is applied to phenomena, the standardised units must be different from the unstandardised units (<span style="background-color:#df9a86">uz_units</span>) in the phenomena table. This ensures that phenomena that are appended have similar units.
+
+```{r, phen standard_eg, eval = TRUE, echo = FALSE}
+pt <- read.csv(file.path(pipe_house$reports, "markdown/phentab_display.csv"))
+kbl(pt) |>
+  kable_paper("hover") |>
+  kable_styling(font_size = 11) |>
+  column_spec(c(8:10), background = "#df9a86") |>
+  column_spec(c(1:7), background = "#aed8f0") |>
+  scroll_box(width = "100%", height = "400px")
+```
+
+After filling in details, to replace `NA` values (only in columns highlighted blue!), rerun `phenomena_sts(pipe_house)`, to imbibe the updated phenomena descriptions, and update the logger data.
+
+Standardised data files get transferred to the 'nomenclature vetted' directory ('nomtab room') using the function below. After being transferred, files in the waiting room (except the nomtab and phentab standards) are automatically removed.
+
+Note in the 'waiting room' how the file extension of files change as they are standardised. Successfully imbibed files have a 'ipr' extension. Post header standardisation the extension changes to 'iph'; the extension becomes 'ipi' when phenomena synonyms are corrected.
+
+
+```{r, nomvet transfer, eval = FALSE}
+# move standardised files to a storage directory
+transfer_sts_files(pipe_house)
+```
+
+__Archiving raw data files__: Before removing raw unstandardised files---if there is a 'raw_room' directory in the pipeline working directory---raw input data files will be copied to this directory and filed in folders by year and month of the lasted date of recording. This is done by the `imbibe_raw_batch()` function.
+
+__Notes on the phenomena standards__: Apart from the usual 'rain_cumm' phenomena where the cumulative total of rainfall 'tips' are summed, hobo logger systems document 'interference' events. Interference events denote when loggers were 'interacted' with in the field, e.g., 'host connected' or 'attached' for when a download cable is attached to the logger. This information will be useful for processing the data later on.
+
+# Make station files
+
+The `append_station_batch()` function updates station files in the 'ipip_room' with files from the 'nomvet_room'. `append_station_batch()` optimises 'non-NA' data retention between overlapping 'date-time' stamps. An important consideration for Hobo-data logger exports that can differ depending on the computing system environment.
+
+```{r, append station files, eval = FALSE, echo = TRUE}
+# append station files + metadata records
+append_station_batch(pipe_house, verbose = TRUE)
+```
+
+Now that station files have been generated lets examine what has been done so far. Station files are maintained in the 'ipip_room' of the pipeline's folder structure.
+
+```{r, examine data, eval = TRUE}
+# list station files in the ipip directory
+sflist <- dta_list(
+  input_dir = pipe_house$ipip_room, # search directory
+  file_ext = ".ipip", # note the station's default file extension
+)
+
+# check what stations are in the ipip room
+print(sflist)
+
+# read in the station file
+sf <- readRDS(file.path(pipe_house$ipip_room, sflist[1]))
+
+# names of the tables stored in the station file
+names(sf)
+```
+
+## 'Raw' data
+
+Our station file has one 'raw' data table, the 'raw_rain' table, composed of the event data below.
+
+```{r, examine 5 min data, eval = TRUE}
+# a look at the first few data rows
+head(sf$raw_rain)
+```
+
+## The 'raw' data-header summary
+
+This table contains summary information on the origin of each data file used to make up the station file.
+```{r, examine data summary, eval = TRUE, echo = FALSE}
+# using kableExtra
+kbl(sf$data_summary) |> kable_paper("hover") |> kable_styling(font_size = 11) |>
+  scroll_box(width = "100%", height = "250px")
+```
+
+## The phenomena table: 'phens'
+
+A station file version of phenomena standards. Note each phenomena variation/synonym has a unique identifier ('phid') within the scope of this station.
+```{r, examine phens, eval = TRUE, echo = FALSE}
+# using kableExtra
+kbl(sf$phens) |> kable_paper("hover") |> kable_styling(font_size = 11) |>
+  scroll_box(width = "100%", height = "180px")
+```
+
+Note the 'phid' link in the temporal phenomena summary below.
+```{r, examine phens summ, eval = TRUE, echo = FALSE}
+# using kableExtra
+kbl(sf$phen_data_summary) |> kable_paper("hover") |> kable_styling(font_size = 11) |>
+  scroll_box(width = "100%", height = "180px")
+```
+
+__Phenomena append notes__: When appending phenomena tables, if there is overlapping data, 'ipayipi' will examine each overlapping phenomena series in turn and overwrite either new data (e.g., additions to a station file) or the station file data. The phenomena data summary keeps a temporal record of how phenomena have been appended. Maintaining these records helps data processing down the pipeline.
+
+__Handling big data__: In order to minimise memory usage when processing station files they are 'decompressed' into temporary station files that by default last the duration of an R session. The temporary files are indexed/chunked/read by date-time. While this reduces memory allocation for further processing there is an initial time cost to chunk data when starting to use a station in an R session using this default setting.
+
+# Integrating field-event data
+
+Event metadata collected in the field, involving checks on the physical rain gauges, is important to integrate into the data pipeline. Below we import event metadata from a database of field records and save in the pipeline's data processing directory.
+
+```{r event metadata1, eval = FALSE}
+## update station metadata ----
+rl <- googlesheets4::read_sheet(
+  ss = "1b-dorAHYT21xa8vWS8tPu7M9NIkc9lrt2yYPVEnxX_o",
+  sheet = "mcp_event_data_generic",
+  range = "A1:Q341",
+  col_names = TRUE,
+  col_types = c("ilTccccdddcllcTTc"),
+  na = ""
+)
+names(rl)[3] <- "date_time"
+meta_read(meta_file = rl, col_types = "ilTccccdddcllcTTc",
+  output_dir = pipe_house$ipip_room, output_name = "event_db"
+)
+```
+Event metadata then gets pushed to appropriate stations using the function below.
+```{r event metadata2, eval = TRUE, echo=TRUE}
+meta_to_station(pipe_house = pipe_house, meta_file = "event_db")
+```
+
+## Missing data---__gaps__
+
+Checking for data 'gaps' in continuous data streams is straight forward---just highlight the missing/NA values. But with discontinuous or event-based data it is more nuanced. `gap_eval_batch()` identifies gap periods, specifically where a logger was not recording, in continuous and discontinuous time-series data. For discontinuous data streams, if the duration between the logger-host connection (download in the field) and next start of logging (derived from the interference events above), exceeds a threshold, a gap is present. The default threshold is 10 minutes --- see the table below.
+
+
+```{r, examine gaps, eval = TRUE, echo = TRUE}
+gap_eval_batch(pipe_house)
+sf <- readRDS(file.path(pipe_house$ipip_room, sflist[4]))[["gaps"]]
+print(sf)
+```
+
+The graph below shows only the Sileza rainfall station with a data gap that exceeded the 10 minute threshold. _Hover over the graph---interact_.
+
+```{r, gap_plot, eval = TRUE, echo = TRUE, fig.height = 2.2}
+p <- dta_availability(pipe_house = pipe_house, plot_tbls = "raw_rain")
+ggplotly(p$plt, tooltip = "text")
+```
+Gaps highlighted in the dark-red colour.
+
+The `gap_eval_batch()` function has detailed help files on how to structure event metadata. This event metadata gets used when 'gaps' are defined. These gaps will need to be imputed with appropriate data in further processing steps not covered here.
+
+# Process data
+Next data is processed using a custom 'pipe sequence'. The 'pipe sequence' details processing operations stage by stage and step by step. The pipe sequence object `pipe_seq` is read into the R environment by sourcing its script as below. This script serves as a reference for processing data. More on the pipe sequence at the end of this document.
+
+```{r embed pipe_sequence, eval = TRUE}
+source('ipayipi_vignettes/rainfall_eg/r/pipe_seq/txs_tb.r')
+dt_process_batch(pipe_house = pipe_house, pipe_seq = pipe_seq)
+```
+
+Note the 'dt_' preffix of processed data tables, and the embedded `pipe_seq` table in the updated station file below. There is also a table of 'pseudo events' or false tips.
+
+```{r vew dtdata, eval = TRUE}
+# read in the station file
+sf <- readRDS(file.path(pipe_house$ipip_room, sflist[1]))
+# names of the tables stored in the station file
+names(sf)
+```
+
+# Inspect data
+
+Visualising the cumulative sum of phenomena is useful for examining rate of change and correlation between datasets.
+
+## Query data
+Station data can be queried across or within pipelines using `dta_pull_flat()`. Data can be saved to file in 'csv' format --- see below.
+
+```{r query data, eval = TRUE}
+# wide format
+# when writing to csv the default output directory is pipe_house$dta_out
+dta_flat_pull(pipe_house = pipe_house,
+  phen_name = "rain_tot", # name of the phenomena --- exact match
+  tab_names = "dt_1_years_agg", # table within which to search for phen
+  out_csv = TRUE,
+  out_csv_preffix = "mcp"
+)
+# long format
+d <- dta_flat_pull(pipe_house = pipe_house, phen_name = "rain_tot",
+  tab_names = "dt_1_years_agg", wide = FALSE
+)
+d$dta
+```
+
+## Visualise monthly anomalies
+
+```{r m anom, eval = TRUE}
+p <- plot_m_anomaly(pipe_house = pipe_house, phen_name = "rain_tot",
+  phen_units = "mm"
+)
+p$plt[[3]]
+p$plt[[4]]
+```
+
+# The rainfall 'pipe_seq'
+
+It's not necessary to understand the detail of each function that builds the `pipe_seq` object below. However, for cusomising these functions, more info can be found in each function's helpfile descriptions, e.g., type `?pipe_seq` in your R console. The `pipe_seq` table from the station file processed above is shown below. Note function parameters ('f_params') are described for each stage ('dt_n') and nested steps ('dtp_n'). The function for each stage's step are in the 'f' column. This pipe sequence table makes it easier to inspect the data processing pipeline. When this table was evaluated by `dt_drocess_batch()` further parameters were produced for each respective function and stored in the station file objects.
+
+```{r, examine pipe_seq, eval = TRUE, echo = TRUE}
+# using kableExtra
+kbl(sf$pipe_seq) |> kable_paper("hover") |> kable_styling(font_size = 11) |>
+  scroll_box(width = "100%", height = "180px")
+```
+
+The rainfall-data pipeline was build using the following script. This pipe sequence can be adjusted and re-embedded into a station file at any time.
+
+```{r, pipe_seq build, eval = TRUE, echo = TRUE}
+library(ipayipi)
+#' Pipeline rainfall data processing sequence
+#' v1.00
+#' Last updated 2024-07-30
+#'
+#' Summary
+#' The pipe sequence is documented as `pipe_seq` below. First calculation
+#'  parameters are defined as consequtively numbered 'x' variables. These
+#'  are used in the `pipe_seq` object.
+#' This `pipe_seq` cleans/processes rainfall data from automatic tipping-
+#' bucket rainguages. Data processed into the folling time
+#' interval aggregations; "5 mins", "hourly", "daily", "monthly", and "yearly".
+#' For compatibility with SAWS an eight hour offest is provided in addition to
+#' the standard daily aggregation.
+
+# define constants ----
+#' general tipping bucket pipeline sequence for rainfall data
+rain_tip <- 0.254 #' value in mm of a single tip-bucket tip
+
+# calc parameters -> passed to `calc_param_eval()` ----
+#' filter the events data based to extract 'pseudo events' (i.e., false tips)
+#' Pseudo events
+x12 <- list(
+  pseudo_ev1 = chainer(dt_syn_bc = "event_type == \'pseudo_events\'"),
+  pseudo_ev2 = chainer(dt_syn_bc = "stnd_title == station"),
+  pseudo_ev3 = chainer(dt_syn_bc = "qa == TRUE")
+)
+#' create a start and end date_time -- necessary for discontinuous data
+#' this will be appended to the discontinuous data series before data
+#' aggregation
+x22 <- list(
+  fork_se1 = chainer(
+    dt_syn_ac = "fktest := fifelse(.I == 1 | .I == .N, TRUE, FALSE)"
+  ),
+  fork_se2 = chainer(dt_syn_bc = "fktest == TRUE"),
+  fork_se3 = chainer(dt_syn_ac = "rain_mm := rain_cumm",
+    measure = "tot", units = "mm", var_type = "num"
+  ),
+  fork_se4 = chainer(dt_syn_ac = "rain_mm := 0"),
+  fork_se5 = chainer(dt_syn_ac = ".(date_time, rain_mm)")
+)
+#' repeat the above after it was written to dt_rain_se in chunked data
+x32 <- list(
+  fork_se1 = chainer(
+    dt_syn_ac = "fktest := fifelse(.I == 1 | .I == .N, TRUE, FALSE)"
+  ),
+  fork_se2 = chainer(dt_syn_bc = "fktest == TRUE"),
+  fork_se4 = chainer(dt_syn_ac = "rain_mm := 0"),
+  fork_se5 = chainer(dt_syn_ac = ".(date_time, rain_mm)")
+)
+#' remove double tips (tips one second after the previous)
+x42 <- list(
+  logg_remove1 = chainer(dt_syn_bc = "!is.na(rain_cumm)"),
+  rain_diff = chainer(
+    dt_syn_ac = "rain_diff := c(0, rain_cumm[2:.N] - rain_cumm[1:(.N - 1)])",
+    measure = "tot", units = "mm", var_type = "num"
+  ),
+  rain_diff_remove = chainer(dt_syn_bc = "rain_diff != 0"),
+  t_lag = chainer(
+    dt_syn_ac = "t_lag := c(0, date_time[2:.N] - date_time[1:(.N - 1)])",
+    measure = "tot", units = "sec", var_type = "num"
+  )
+)
+#' summarise pseudo events--false tips
+x47 <- list(
+  false_tip_type1 = chainer(dt_syn_ac = paste0("false_tip_type := fifelse(",
+      "logg_interfere_type %in% \'on_site\', \'interfere\', NA_character_)"
+    ), temp_var = FALSE, measure = "smp", units = "false_tip", var_type = "chr"
+  ),
+  false_tip_type2 = chainer(dt_syn_ac = paste0("false_tip_type := fifelse(",
+    "is.na(false_tip_type) & event_type %in% \'pseudo_events\',",
+    "\'pseudo_event\', false_tip_type)"
+  )),
+  false_tip_type3 = chainer(dt_syn_ac = paste0("false_tip_type := ",
+    "fifelse(t_lag == 1, \'double_tip\', false_tip_type)"
+  )),
+  false_tip4 = chainer(
+    dt_syn_ac = "false_tip := fifelse(!is.na(false_tip_type), TRUE, FALSE)",
+    temp_var = FALSE, measure = "smp", units = "false_tip", var_type = "logi"
+  ),
+  false_tip5 = chainer(dt_syn_ac =
+      "false_tip := fifelse(problem_gap %in% FALSE, FALSE, false_tip)"
+  ),
+  false_tip6 = chainer(
+    dt_syn_ac = "false_tip := fifelse(is.na(false_tip), FALSE, false_tip)"
+  ),
+  clean_up1 = chainer(dt_syn_ac = paste0(".(date_time, rain_cumm, rain_diff, ",
+    "false_tip, false_tip_type, problem_gap)"
+  )),
+  false_tip_table = chainer(dt_syn_bc = "false_tip == FALSE",
+    dt_syn_ac = ".(date_time, false_tip, false_tip_type, problem_gap)",
+    fork_table = "pseudo_events"
+  ),
+  clean_up2 = chainer(dt_syn_ac = paste0(".(date_time)")),
+  rain_mm = chainer(dt_syn_ac = paste0("rain_mm := ", rain_tip),
+    measure = "tot", units = "mm", var_type = "num"
+  )
+)
+#' remove old start end date-time values
+x52 <- list(clean_se = chainer(dt_syn_bc = "!rain_mm == 0"))
+#' filter gaps before joining --- only want 'problem gaps'
+x62 <- list(pgap = chainer(dt_syn_bc = "problem_gap == TRUE",
+  dt_syn_ac = ".(gap_start, gap_end, problem_gap)"
+))
+
+# build pipe sequence ----
+#' this builds the table from the described parameters that will be evaluated
+#' to generate parameters for processing the data
+pipe_seq <- pipe_seq(p = pdt(
+  # extract pseudo events
+  p_step(dt_n = 1, dtp_n = 1, f = "dt_harvest",
+    f_params = hsf_param_eval(hsf_table = "meta_events"),
+    output_dt = "dt_pseudo_event"
+  ),
+  p_step(dt_n = 1, dtp_n = 2, f = "dt_calc",
+    f_params = calc_param_eval(x12),
+    output_dt = "dt_pseudo_event"
+  ),
+  #' create 'fork_se'
+  #' the fork start and end date-time will be appended to data before
+  #' time interval aggregations---NB for event data
+  #' this feeds the aggregation function the full range of data to
+  #' be aggregated. Without this the leading and training time where events
+  #' aren't logged will be cut short from the aggregation
+  p_step(dt_n = 2, dtp_n = 1, f = "dt_harvest",
+    f_params = hsf_param_eval(hsf_table = "raw_rain"),
+    output_dt = "dt_rain_se"
+  ),
+  p_step(dt_n = 2, dtp_n = 2, f = "dt_calc",
+    f_params = calc_param_eval(x22),
+    output_dt = "dt_rain_se"
+  ),
+  # join 'fork_se' with old 'fork_se'
+  p_step(dt_n = 3, dtp_n = 1, f = "dt_harvest",
+    f_params = hsf_param_eval(hsf_table = "dt_rain_se"),
+    output_dt = "dt_rain_se"
+  ),
+  p_step(dt_n = 3, dtp_n = 2, f = "dt_calc",
+    f_params = calc_param_eval(x32),
+    output_dt = "dt_rain_se"
+  ),
+  # find 'double tips'
+  p_step(dt_n = 4, dtp_n = 1, f = "dt_harvest",
+    f_params = hsf_param_eval(hsf_table = "raw_rain"),
+    output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 4, dtp_n = 2, f = "dt_calc",
+    f_params = calc_param_eval(x42),
+    output_dt = "dt_rain"
+  ),
+  # get interference events
+  p_step(dt_n = 4, dtp_n = 3, f = "dt_harvest",
+    f_params = hsf_param_eval(hsf_table = "logg_interfere"),
+    output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 4, dtp_n = 4, f = "dt_join",
+    f_params = join_param_eval(join = "left_join", fuzzy = c(0, 600))
+  ),
+  # add pseudo events
+  p_step(dt_n = 4, dtp_n = 5, f = "dt_harvest",
+    f_params = hsf_param_eval(hsf_table = "dt_pseudo_event"),
+    output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 4, dtp_n = 6, f = "dt_join",
+    f_params = join_param_eval(join = "left_join", fuzzy = 0,
+      y_key = c("start_dttm", "end_dttm")
+    ), output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 4, dtp_n = 7, f = "dt_calc",
+    f_params = calc_param_eval(x47),
+    output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 5, dtp_n = 1, f = "dt_harvest",
+    f_params = hsf_param_eval(hsf_table = "dt_rain"),
+    output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 5, dtp_n = 2, f = "dt_calc",
+    f_params = calc_param_eval(x52),
+    output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 5, dtp_n = 3, f = "dt_harvest",
+    f_params = hsf_param_eval(hsf_table = "dt_rain_se"),
+    output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 5, dtp_n = 4, f = "dt_join",
+    join_param_eval(), output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 6, dtp_n = 1, f = "dt_harvest",
+    hsf_param_eval(hsf_table = "gaps"),
+    output_dt = "dt_gaps_tmp"
+  ),
+  p_step(dt_n = 6, dtp_n = 2, f = "dt_calc",
+    calc_param_eval(x62), output_dt = "dt_gaps_tmp"
+  ),
+  # aggregate data
+  p_step(dt_n = 7, dtp_n = 1, f = "dt_harvest",
+    hsf_param_eval(hsf_table = "dt_rain"),
+    output_dt = "dt_rain"
+  ),
+  p_step(dt_n = 7, dtp_n = 2, f = "dt_agg",
+    agg_param_eval(
+      agg_intervals = c("5 mins", "hourly", "daily"),
+      ignore_nas = TRUE, all_phens = FALSE,
+      agg_parameters = aggs(
+        rain_mm = agg_params(units = "mm", phen_out_name = "rain_tot")
+      )
+    )
+  ),
+  # saws daily data aggregation
+  p_step(dt_n = 7, dtp_n = 3, f = "dt_agg",
+    agg_param_eval(
+      agg_offset = "8 hours",
+      agg_intervals = c("daily"),
+      ignore_nas = TRUE,
+      all_phens = FALSE,
+      agg_parameters = aggs(
+        rain_mm = agg_params(units = "mm", phen_out_name = "rain_tot")
+      ),
+      agg_dt_suffix = "_agg_saws"
+    )
+  ),
+  p_step(dt_n = 8, dtp_n = 1, f = "dt_harvest",
+    hsf_param_eval(hsf_table = "dt_1_days_agg")
+  ),
+  p_step(dt_n = 8, dtp_n = 2, f = "dt_agg",
+    agg_param_eval(
+      agg_intervals = c("monthly", "yearly"),
+      ignore_nas = TRUE
+    )
+  )
+))
+```
+
+When running the pipe sequence we choose what portion of it to run by limiting the `stages` argument in `dt_process_batch()`---we can't run the latter stages though without the former. This allows interruption of processing for imputing data etc.
+
+
+# Tips for working in 'ipayipi'
+
+ - Processing functions have filter keywords for limiting the scope of data being processed allowing the use to drill down on a subset of particular stations. The filter keywords are 'regex' based and parsed as 'wanted' and 'unwanted' arguments to most 'ipayipi' functions.
+ - It makes sense to start with on station or fewer files to learn how the process works before processing to much data.
+ - Set 'prompt' to TRUE for interactive selection of stations.
+ - Data chunking: station files are chunked and indexed by default in temporary memory within an R session. At the start of the R session there may be a delay in processing as files are 'decompressed' into chunks. To avoid the start-up cost of chunking, the chunk directory can be set out of temporary memory, e.g., `options(chunk_dir = "~/ipip")`.
+ - By default processing is done 'sequentially', however, using the 'future' framework parallel processing has been built into 'ipayipi' and is activated by setting `plan(multisession)` on Windows or `plan(multicore)` on Linux or MacOS. NB! Running in parallel will disable any interactive prompts, and may limit function message/error reporting. Something to be aware of. Also, running a 'multisession' is not always efficient. Test out various options as speed will be influenced by load bearing and your local system. Running on 'multisession' may produce errors that don't occur when `plan(sequential, split = TRUE)` is called.
+
+```{r, remove nomvet and raw files, eval = TRUE, results = 'hide', echo = FALSE}
+unlink(pipe_house$raw_room, recursive = TRUE)
+#unlink(pipe_house$nomvet_room, recursive = TRUE)
+#unlink(pipe_house$ipip_room, recursive = TRUE)
+```
