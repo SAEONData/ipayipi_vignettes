@@ -80,6 +80,15 @@ transfer_sts_files(pipe_house)
 # the append function evaluates the 'nomvet room' and appends
 # standardised files there in to create/update station files
 append_station_batch(pipe_house, verbose = TRUE)
+# note that in the background ipayipi 'chunks' the station file
+# in temporary memory giving it the ability to minimise
+# memory usage and setup quick queries
+# Each time the station file is opened in another function below
+# the background work is done in the chunked files and saved to
+# the station file you see in the ipip_room directory.
+# there are ways to optimise how this is done that can be discussed
+# sometime i.e., setting the chunk directory to a permanent one
+
 
 ## evaluate gaps in raw data tables ---
 # generate a 'gap' table - can be used for further processing
@@ -94,17 +103,19 @@ p$plt
 source("ipayipi_vignettes/met_cs_qa_eg/r/pipe_seq/vasi_pipe_seq_eg.r")
 # then embed the pipe sequence, evaluate it and develop standards for
 #  processing, and process data
-
-microbenchmark::microbenchmark(
-  dt_process_batch(pipe_house = pipe_house, pipe_seq = pipe_seq,
-    overwrite_pipe_memory = FALSE, verbose = TRUE
-  )
+dt_process_batch(pipe_house = pipe_house, pipe_seq = pipe_seq,
+  overwrite_pipe_memory = TRUE, verbose = TRUE
 )
+# this with the aggregations on my desktop takes just under a minute to
+# process these just under half a mil rows
 
 # read a station into memory
 s <- readRDS(
   "ipayipi_vignettes/met_cs_qa_eg/ipip_room/mcp_vasi_science_aws.ipip"
 )
+
+# view names of 'items' in station file (a station file is an R list)
+names(s)
 
 # query station data
 # see the help files for more options here this can be used to
