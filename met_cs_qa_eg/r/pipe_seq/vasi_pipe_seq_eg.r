@@ -212,11 +212,11 @@ pipe_seq <- pipe_seq(p = pdt(
     f_params = calc_param_eval(x13)
   ),
   # aggregate data into level one products
-  p_step(dt_n = 4, dtp_n = 1, f = "dt_harvest",
+  p_step(dt_n = 2, dtp_n = 1, f = "dt_harvest",
     f_params = hsf_param_eval(),
     output_dt_suffix = "_tmp"
   ),
-  p_step(dt_n = 4, dtp_n = 2, f = "dt_agg",
+  p_step(dt_n = 2, dtp_n = 2, f = "dt_agg",
     f_params = agg_param_eval(
       agg_intervals = c("hourly", "days", "months", "years"),
       ignore_nas = TRUE
