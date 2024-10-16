@@ -192,7 +192,7 @@ x13 <- list(flagsfilter1 = chainer(
   dt_syn_ac = paste0("flag_tot := rowSums(.SD, na.rm = TRUE), ",
     ".SDcols = names(dt)[names(dt) %ilike% \'flag\']"
   )
-), flagsfilter2 = chainer(dt_syn_bc = "flag_tot > 0"))
+))
 
 
 # put pipeline steps together (also using described calculations above)
@@ -210,16 +210,5 @@ pipe_seq <- pipe_seq(p = pdt(
   # summarise flags/checks
   p_step(dt_n = 1, dtp_n = 3, f = "dt_calc",
     f_params = calc_param_eval(x13)
-  ),
-  # aggregate data into level one products
-  p_step(dt_n = 2, dtp_n = 1, f = "dt_harvest",
-    f_params = hsf_param_eval(),
-    output_dt_suffix = "_tmp"
-  ),
-  p_step(dt_n = 2, dtp_n = 2, f = "dt_agg",
-    f_params = agg_param_eval(
-      agg_intervals = c("hourly", "days", "months", "years"),
-      ignore_nas = TRUE
-    )
   )
 ))

@@ -127,3 +127,6 @@ dta_flat_pull(pipe_house = pipe_house,
 
 # alternatively, if you don't only want to view station tables in r
 # you can export them to csv format using `ipayipi::ipayipi2csv()`
+ipayipi2csv(pipe_house = pipe_house, wanted_tabs = "dt_",
+  output_dir = pipe_house$dta_out
+)
