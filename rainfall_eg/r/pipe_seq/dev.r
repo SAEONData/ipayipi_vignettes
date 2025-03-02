@@ -1,0 +1,52 @@
+library(ipayipi)
+options(chunk_dir = "~/ipip")
+getOption("chunk_dir")
+
+wd <- "ipayipi_vignettes/rainfall_eg"
+pipe_house <- ipip_house(wd)
+
+# dt_process ----
+wanted <- "office"
+source('ipayipi_vignettes/rainfall_eg/r/pipe_seq/txs_tb.r')
+station_file <- "ipayipi_vignettes/rainfall_eg/ipip_room/mcp_manz_office_pr.ipip"
+pipe_seq = pipe_seq
+output_dt_preffix = "dt_"
+output_dt_suffix = NULL
+overwrite_pipe_memory = T
+verbose = TRUE
+unwanted_tbls = "_tmp"
+xtra_v <- TRUE
+chunk_v <- TRUE
+stages = NULL
+dt_format = c(
+"Ymd HMOS", "Ymd HMS",
+"Ymd IMOSp", "Ymd IMSp",
+"ymd HMOS", "ymd HMS",
+"ymd IMOSp", "ymd IMSp",
+"mdY HMOS", "mdY HMS",
+"mdy HMOS", "mdy HMS",
+"mdy IMOSp", "mdy IMSp",
+"dmY HMOS", "dmY HMS",
+"dmy HMOS", "dmy HMS",
+"dmy IMOSp", "dmy IMSp"
+)
+dt_tz = "Africa/Johannesburg"
+### dt_calc args ----
+station_file_ext <- ".ipip"
+
+
+# plot_bar_agg
+input_dir = "."
+agg = "1 month"
+phen_name = "rain_tot"
+tbl_search_key = "dt_1_months_agg"
+show_gaps = FALSE
+wanted = NULL
+unwanted = NULL
+x_lab = "Date-time"
+y_lab = NULL
+file_ext = ".ipip"
+prompt = FALSE
+recurr = TRUE
+pipe_house = pipe_house
+
